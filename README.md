@@ -8,6 +8,6 @@ The Emulator's [firmware](EPROM-Emulator.asm) is assembled using the [The Telema
 
 The EPROM Emulator was constructed on a Vector Prototyping board using wire-wrap techniques.
 <figure>
-  <img src="/images/Emulator.jpeg"/>
+  <img src="/images/Emulator.jpg"/>
   <figcaption>2732 EPROM Emulator</figcaption>
 </figure>

@@ -4,6 +4,6 @@ This EPROM Emulator dramatically speeds up the process of testing revisions to t
 
 The Emulator's firmware also allows the user to display and modify the Dual Port RAM contents over the serial connection.
 
-The Emulator's firmware is assembled using the [The Telemark Assembler](http://www.cpcalive.com/docs/TASMMAN.HTM) by Squak Valley Software.
+The Emulator's [firmware](EPROM-Emulator.asm) is assembled using the [The Telemark Assembler](http://www.cpcalive.com/docs/TASMMAN.HTM) by Squak Valley Software.
 
 The EPROM Emulator was constructed on a Vector Prototyping board using wire-wrap techniques.

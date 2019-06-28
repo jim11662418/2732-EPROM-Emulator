@@ -1,0 +1,44 @@
+        .nolist
+;macros for 8031 assembler
+
+;get a byte from external ram into acc
+#define         getxdata(address)   push    DPH
+#defcont                          \ push    DPL
+#defcont                          \ mov     DPTR,#address
+#defcont                          \ movx    A,@DPTR
+#defcont                          \ pop     DPL
+#defcont                          \ pop     DPH
+
+;store the byte in acc into external ram
+#define         putxdata(address)   push    DPH
+#defcont                          \ push    DPL
+#defcont                          \ mov     DPTR,#address
+#defcont                          \ movx    @DPTR,A
+#defcont                          \ pop     DPL
+#defcont                          \ pop     DPH
+
+;get a byte from a table in the code space into acc (acc is index into table)
+#define         getctable(address)   push    DPH
+#defcont                           \ push    DPL
+#defcont                           \ mov     DPTR,#address
+#defcont                           \ movc    A,@a+DPTR
+#defcont                           \ pop     DPL
+#defcont                           \ pop     DPH
+
+;long jump to target if arg1 = arg2
+#define cje(arg1,arg2,target)         cjne    arg1,arg2,*+6
+#defcont                            \ ljmp    target
+
+;long jump to target if arg1 < arg2
+#define cjl(arg1,arg2,target)         cjne    arg1,arg2,*+3
+#defcont                            \ jnc     *+5
+#defcont                            \ ljmp    target
+
+;long jump if arg1 > arg2
+#define cjg(arg1,arg2,target)          cjne    arg1,arg2,*+5
+#defcont                             \ sjmp    *+7
+#defcont                             \ jc      *+5
+#defcont                             \ ljmp    target
+
+        .list
+

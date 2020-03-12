@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------------------------------------------------------
-; Copyright Â© 2020 Jim Loos
+; Copyright © 2020 Jim Loos
 ; 
 ; Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
 ; (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge,
@@ -14,42 +14,32 @@
 ; IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ;---------------------------------------------------------------------------------------------------------------------------------
 
-; Load a Intel hex file into IDT7134 Dual-port RAM.
-; the Dual-port RAM connects through a ribbon cable 
-; to the 2732 EPROM socket on the 4004 single
-; board computer to act as as EPROM emulator.
-; Version 1.0 - Initial release.
-; Version 2.0 - Changed from Dallas Semiconductor DS89C420 to Atmel AT89S52 CPU.
+;---------------------------------------------------------
+;For the Maxim DS89C440 MCU at 115200 bps
+;---------------------------------------------------------
 
-#include "8052.51"
+; Load a Intel hex file into IDT7134 Dual-port RAM.
+; The Dual-port RAM connects to the 2732 EPROM socket
+; on the 4004 single board computer to act as as EPROM emulator.
+
+#include "ds89c4x0.51"
 #include "macros.51"
 
 ;constants...
 cr              .equ    0DH             ;character equates
 lf              .equ    0AH
-esc             .equ    1BH
+escape          .equ    1BH
 
 LED             .equ    T0              ;LED connected to T0
 
-bps28800	      .equ    0FFH
-bps14400	      .equ    0FEH
-bps9600	        .equ    0FDH
-bps4800	        .equ    0FAH
-bps2400	        .equ    0F4H
-bps1200	        .equ    0E8H
-bps300	        .equ    0A0H
-
 reloadhi        .equ    04BH
 reloadlo        .equ    0FCH            ;65536-46079=19457 less 5
-
-t1mh            .equ    09AH
-CKMOD           .equ    096H
 
 ;bit addressable RAM 20H-2FH
 tx_ready        .equ    bit_20.0
 
 ;internal RAM used by monitor
-loop_count      .equ    39H
+loop_count      .equ    39H             ;2 bytes: 39A and 3AH
 tick_count      .equ    3BH             ;counters for timer 1 interrupt routine
 seconds         .equ    3CH             ;RTC seconds counter
 minutes         .equ    3DH             ;RTC minutes counter
@@ -61,7 +51,7 @@ rcv_buffer      .equ    70H             ;8 bytes (70H - 77H)
 rcv_in_ptr      .equ    78H             ;receive buffer input pointer
 rcv_out_ptr     .equ    79H             ;receive buffer output pointer
 
-                 .org    0
+                .org    0
                 ljmp    init
 
                 .org    03              ;external interrupt 0
@@ -82,22 +72,51 @@ rcv_out_ptr     .equ    79H             ;receive buffer output pointer
                 .org    2BH             ;timer 2
                 ljmp	timer2
 
+                .org    33H             ;power fail interrupt
+                ljmp	powerfail
+
+                .org    3BH             ;serial 1
+                ljmp	serial1
+
+                .org    43H             ;external interrupt 2
+                ljmp	external2
+
+                .org    4BH             ;external interrupt 3
+                ljmp	external3
+
+                .org    53H             ;external interrupt 4
+                ljmp	external4
+
+                .org    5BH             ;external interrupt 5
+                ljmp	external5
+
+                .org    63H             ;watchdog timeout
+                ljmp	watchdog
 
 external0:      reti
 external1:      reti
 timer1:         reti
 timer2:         reti
+powerfail:      reti
 serial1:        reti
+external2:      reti
+external3:      reti
+external4:      reti
+external5:      reti
+watchdog:       reti
 
-
-;start of monitor program
-
-                .org    100H                    ;start of monitor code
-                mov     A,#0                    ;short delay
-                djnz    ACC,*                
+;start of eprom emulator program...
+                .org    100H                    ;start of code
 init:           mov     IE,#0                   ;disable all interrupts
                 mov     SP,#stack_base          ;set the stack pointer somewhere safe
                 mov     PSW,#0                  ;set register bank zero
+
+                clr     TI                      ;clear transmit interrupt flag
+                setb    tx_ready                ;ready to transmit
+                clr     RI                      ;clear receive interrupt flag
+
+                mov     rcv_in_ptr,#rcv_buffer  ;initialize buffer pointers
+                mov     rcv_out_ptr,#rcv_buffer
 
                 mov     tick_count,#20          ;initialize RTC counters
                 mov     seconds,#0
@@ -111,31 +130,64 @@ init:           mov     IE,#0                   ;disable all interrupts
 ;initialize the timer/counters.  
 ;timer 1 is to be configured as mode 2, 8 bit auto-reload to generate the serial port baud rate. 
 ;timer 0 is to be configured as mode 1, 16 bit counter/timer.  timer 0 interrupt is dedicated to the real time clock.
+                mov     CKMOD,#00010000B        ;make timer 1 clocked by OSC/1 (11.059 MHz) instead of the default OSC/12. Note: only works on the DS89C440 MCU
                 mov     TMOD,#00100001B         ;set timer 1 to mode 2 (8 bit auto reload), set timer 0 to mode 1
                 mov     TL0,#reloadlo           ;load timer 0 low byte
                 mov     TH0,#reloadhi           ;load timer 0 high byte
-                mov     TH1,#bps9600            ;load timer 1 value for 9600 bps
-                mov     rcv_in_ptr,#rcv_buffer  ;initialize buffer pointers
-                mov     rcv_out_ptr,#rcv_buffer
+                mov     TH1,#253                ; for 115200 bps
 
 ;enable interrupts                
                 setb    TR0                     ;enable timer 0 for real time clock
                 setb    TR1                     ;enable timer 1 for serial port baud rate
-                setb    IP.4                    ;make serial interrupt higher priority
-                setb    IP.1                    ;make timer 0 interrupt higher priority
                 setb    IE.1                    ;enable timer 0 overflow interrupt
                 setb    IE.4                    ;enable serial port interrupts
                 setb    IE.7                    ;global interrupt enable
-               
+
+                mov     A,#10                   ;short delay
+                djnz    ACC,*
+                
+                lcall   puts
+                .text   "\r\n"
+                .db     0
+;determine the cause of the last reset...
+                jb      WTRF,wd_reset
+                jb      POR,POR_reset
+
+                lcall   puts
+                .text   "\r\nExternal reset.\r\n"
+                .db     0
+                sjmp    sign_on
+                
+wd_reset:       lcall   puts
+                .text   "\r\nWatchdog reset.\r\n"
+                .db     0
+                mov     TA, #0aah               ;timed access
+                mov     TA, #055h
+                clr     EWT                     ;clear watchdog timer reset enable
+
+                mov     A,#0                    ;short delay
+                djnz    ACC,*
+
+                mov     TA, #0aah               ;timed access
+                mov     TA, #055h
+                clr     WTRF                    ;clear watchdog timer reset flag for next time                
+                sjmp    sign_on
+                
+POR_reset:      lcall   puts
+                .text   "\r\nPower on reset.\r\n"
+                .db     0
+                mov     TA,#0aah                ;timed access
+                mov     TA,#055h
+                clr     POR                     ;clear power on reset flag for next time                
+          
 sign_on:        lcall   puts
                 .text   "\r\n"
-                .text   "IDT7134 EPROM Emulator Version 2.0.6\r\n"
+                .text   "IDT7134 EPROM Emulator Version 1.7.0\r\n"
                 .db     0
                 sjmp    showcmds
 
 get_monitor_cmd:
                 lcall   crlf
-                orl     PSW,#00011000B          ;use register bank 3 for monitor
                 lcall   puts
                 .text   "\n\r>>"                ;prompt
                 .db     0
@@ -214,20 +266,19 @@ mem4:           cje(A,#cr,get_monitor_cmd)
                 inc     DPTR            ;point to next location
                 sjmp    mem1            ;and continue
 
-
 ;------------------------------------------------------------------------
 ; Download Intel HEX file into Dual-port RAM
 ; R5, holds the number of bytes per line, R6 holds the checksum for the line,
 ; R7 holds the checksum error count.
-; NOTE: when using the Teraterm "Send File" function, make sure the "Binary" option is selected!
+; Record type is ignored.
 ;------------------------------------------------------------------------
 ;A record (line of text) consists of six fields (parts) that appear in order from left to right:
 ;   1. Start code, one character, an ASCII colon ':'.
-;   2. Byte count, two hex digits, indicating the number of bytes (hex digit pairs) in the data field. The maximum byte count is 255 (0xFF). 16 (0x10) and 32 (0x20) are commonly used byte counts.
-;   3. Address, four hex digits, representing the 16-bit beginning memory address offset of the data. The physical address of the data is computed by adding this offset to a previously established base address, thus allowing memory addressing beyond the 64 kilobyte limit of 16-bit addresses. The base address, which defaults to zero, can be changed by various types of records. Base addresses and address offsets are always expressed as big endian values.
+;   2. Byte count, two hex digits, indicating the number of bytes (hex digit pairs) in the data field.
+;   3. Address, four hex digits, representing the 16-bit beginning memory address offset of the data.
 ;   4. Record type, two hex digits (00=data, 01=end of file), defining the meaning of the data field.
-;   5. Data, a sequence of n bytes of data, represented by 2n hex digits. Some records omit this field (n equals zero). The meaning and interpretation of data bytes depends on the application.
-;   6. Checksum, two hex digits, a computed value (starting with the byte count) that can be used to verify the record has no errors.
+;   5. Data, a sequence of n bytes of data, represented by 2n hex digits.
+;   6. Checksum, two hex digits, a computed value (starting with the byte count) used to verify record data.
 
 ;start of Intel hex record (':') received at the '>>' prompt
 starthexdl:     mov     R7,#0                   ;clear error count
@@ -240,8 +291,8 @@ load:           lcall   puts                   ;prompt for start of xfer
 
 getfirstchar:   lcall   getc                    ;get the first character
 echofirstchar:  lcall   putc                    ;echo it
-                cjne    A,#esc,checkstartchar
-                ljmp    init                    ;restart if escape key
+                cjne    A,#escape,checkstartchar
+                ljmp    get_monitor_cmd         ;abort if escape key
 
 checkstartchar: cjne    A,#':',getfirstchar     ;go back and wait wait for start character
                 lcall   read_two                ;get byte count
@@ -252,6 +303,9 @@ checkstartchar: cjne    A,#':',getfirstchar     ;go back and wait wait for start
                 mov     DPH,A
                 add     A,R6                    ;add high byte to checksum
                 mov     R6,A
+                ;mov     A,DPH                   ;recall the high byte of the address
+                ;anl     A,#0FH                  ;mask the high byte so that addresses are in the range 0000H-0FFFH
+                ;mov     DPH,A                   ;restore the high byte of the address
                 lcall   read_two                ;get low byte of start address
                 mov     DPL,A
                 add     A,R6
@@ -275,11 +329,7 @@ readloop:       lcall   read_two                ;get the data byte
                 subb    A,R6                    ;subtract computed checksum from byte
                 jz      csum_OK                 ;zero means they agree
                 inc     R7                      ;increment error counter
-csum_OK:        lcall   getc                    ;get line feed
-                lcall   putc                    ;echo it
-                lcall   getc                    ;get carriage return
-                lcall   putc                    ;echo it                
-                ajmp    getfirstchar            ;go back for next line
+csum_OK:        ajmp    getfirstchar            ;go back for next line
 
 lastrecord:     lcall   read_two                ;get the last address high byte
                 lcall   read_two                ;get the last address low byte
@@ -287,8 +337,6 @@ lastrecord:     lcall   read_two                ;get the last address high byte
                 lcall   read_two                ;get the last checksum
                 lcall   getc                    ;get the last carriage return
                 lcall   putc                    ;echo it                
-;               lcall   getc                    ;get the last line feed
-;               lcall   putc                    ;echo it                
 
                 mov     A,R7                    ;get error count
                 swap    A                       ;swap nibbles
@@ -472,7 +520,7 @@ move_exit:      ljmp    get_monitor_cmd
 ; byte returned in a.  returns with carry flag set if escape key is pressed.
 ;------------------------------------------------------------------------
 read_two:       lcall   get_hex         ;get the first character
-read_two1:      cje(A,#esc,read_two6)   ;jump if escape key
+read_two1:      cje(A,#escape,read_two6);jump if escape key
                 cje(A,#cr,read_two6)    ;jump if return key
 read_two2:      cjl(A,#'0',read_two)    ;try again if less than '0'
 
@@ -481,7 +529,7 @@ read_two2:      cjl(A,#'0',read_two)    ;try again if less than '0'
                 mov     B,A             ;save the first digit in b
 
 read_two4:      lcall   get_hex         ;get next character
-                cje(A,#esc,read_two5)   ;jump if escape key
+                cje(A,#escape,read_two5);jump if escape key
                 cje(A,#cr,read_two7     ;jump if enter key
                 cjl(A,#'0',read_two4)   ;try again if less than '0'
 
@@ -518,7 +566,7 @@ read_four:      mov     DPL,#0
                 mov     B,#3                    ;maximum of three more characters
 read_four2:     lcall   get_hex                 ;get the next three digits
                 cje(A,#cr,read_four3)           ;exit if enter key is pressed
-                cje(A,#esc,read_four4)          ;exit if escape key is pressed
+                cje(A,#escape,read_four4)       ;exit if escape key is pressed
                 cje(A,#' ',read_four2)          ;try again if space bar
                 lcall   shift
                 djnz    B,read_four2
@@ -588,7 +636,7 @@ a2lt10:         mov     A,B
 
 
 ;------------------------------------------------------------------------
-; converts the lower nibble in a to an ASCII character returned in a
+; converts the lower nibble in A to an ASCII character returned in A
 ;------------------------------------------------------------------------
 hex2asc:        push    B
                 anl     A,#00001111B
@@ -674,7 +722,7 @@ get_hex:        lcall   serial_input
                 jnc     get_hex         ;wait for a character
                 anl     A,#01111111B    ;mask out parity
                 cje(A,#cr,get_hex3)     ;exit if enter key
-                cje(A,#esc,get_hex3)    ;exit if escape key
+                cje(A,#escape,get_hex3) ;exit if escape key
                 cje(A,#' ',get_hex3)    ;exit if space bar
                 cjl(A,#'0',get_hex)     ;try again if less than '0'
                 cjl(A,#'a',get_hex1)    ;jump if already upper case...
@@ -831,8 +879,6 @@ printdecimal3:  mov     A,B                     ;get the remainder
                 pop     0
                 pop     B
                 pop     ACC
-                ret
-            
                 
 ;-------------------------------------------------------------------
 ;serial0 interrupt handler
@@ -854,9 +900,6 @@ s1:             jnb     RI,s2                   ;jump if not a receive interrupt
                 orl     rcv_in_ptr,#rcv_buffer
 
 s2:             pop     PSW
-                reti
-
-exit_serial0:   pop     PSW
                 reti
 
 

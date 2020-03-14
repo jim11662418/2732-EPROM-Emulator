@@ -1,0 +1,377 @@
+.NOLIST
+; BIT ADDRESS MAPS
+bit_20.0    .equ    00H
+bit_20.1    .equ    01H
+bit_20.2    .equ    02H
+bit_20.3    .equ    03H
+bit_20.4    .equ    04H
+bit_20.5    .equ    05H
+bit_20.6    .equ    06H
+bit_20.7    .equ    07H
+
+bit_21.0    .equ    08H
+bit_21.1    .equ    09H
+bit_21.2    .equ    0AH
+bit_21.3    .equ    0BH
+bit_21.4    .equ    0CH
+bit_21.5    .equ    0DH
+bit_21.6    .equ    0EH
+bit_21.7    .equ    0FH
+
+bit_22.0    .equ    10H
+bit_22.1    .equ    11H
+bit_22.2    .equ    12H
+bit_22.3    .equ    13H
+bit_22.4    .equ    14H
+bit_22.5    .equ    15H
+bit_22.6    .equ    16H
+bit_22.7    .equ    17H
+
+bit_23.0    .equ    18H
+bit_23.1    .equ    19H
+bit_23.2    .equ    1AH
+bit_23.3    .equ    1BH
+bit_23.4    .equ    1CH
+bit_23.5    .equ    1DH
+bit_23.6    .equ    1EH
+bit_23.7    .equ    1FH
+
+bit_24.0    .equ    20H
+bit_24.1    .equ    21H
+bit_24.2    .equ    22H
+bit_24.3    .equ    23H
+bit_24.4    .equ    24H
+bit_24.5    .equ    25H
+bit_24.6    .equ    26H
+bit_24.7    .equ    27H
+
+bit_25.0    .equ    28H
+bit_25.1    .equ    29H
+bit_25.2    .equ    2AH
+bit_25.3    .equ    2BH
+bit_25.4    .equ    2CH
+bit_25.5    .equ    2DH
+bit_25.6    .equ    2EH
+bit_25.7    .equ    2FH
+
+bit_26.0    .equ    30H
+bit_26.1    .equ    31H
+bit_26.2    .equ    32H
+bit_26.3    .equ    33H
+bit_26.4    .equ    34H
+bit_26.5    .equ    35H
+bit_26.6    .equ    36H
+bit_26.7    .equ    37H
+
+bit_27.0    .equ    38H
+bit_27.1    .equ    39H
+bit_27.2    .equ    3AH
+bit_27.3    .equ    3BH
+bit_27.4    .equ    3CH
+bit_27.5    .equ    3DH
+bit_27.6    .equ    3EH
+bit_27.7    .equ    3FH
+
+bit_28.0    .equ    40H
+bit_28.1    .equ    41H
+bit_28.2    .equ    42H
+bit_28.3    .equ    43H
+bit_28.4    .equ    44H
+bit_28.5    .equ    45H
+bit_28.6    .equ    46H
+bit_28.7    .equ    47H
+
+bit_29.0    .equ    48H
+bit_29.1    .equ    49H
+bit_29.2    .equ    4AH
+bit_29.3    .equ    4BH
+bit_29.4    .equ    4CH
+bit_29.5    .equ    4DH
+bit_29.6    .equ    4EH
+bit_29.7    .equ    4FH
+
+bit_2A.0    .equ    50H
+bit_2A.1    .equ    51H
+bit_2A.2    .equ    52H
+bit_2A.3    .equ    53H
+bit_2A.4    .equ    54H
+bit_2A.5    .equ    55H
+bit_2A.6    .equ    56H
+bit_2A.7    .equ    57H
+
+bit_2B.0    .equ    58H
+bit_2B.1    .equ    59H
+bit_2B.2    .equ    5AH
+bit_2B.3    .equ    5BH
+bit_2B.4    .equ    5CH
+bit_2B.5    .equ    5DH
+bit_2B.6    .equ    5EH
+bit_2B.7    .equ    5FH
+
+bit_2C.0    .equ    60H
+bit_2C.1    .equ    61H
+bit_2C.2    .equ    62H
+bit_2C.3    .equ    63H
+bit_2C.4    .equ    64H
+bit_2C.5    .equ    65H
+bit_2C.6    .equ    66H
+bit_2C.7    .equ    67H
+
+bit_2D.0    .equ    68H
+bit_2D.1    .equ    69H
+bit_2D.2    .equ    6AH
+bit_2D.3    .equ    6BH
+bit_2D.4    .equ    6CH
+bit_2D.5    .equ    6DH
+bit_2D.6    .equ    6EH
+bit_2D.7    .equ    6FH
+
+bit_2E.0    .equ    70H
+bit_2E.1    .equ    71H
+bit_2E.2    .equ    72H
+bit_2E.3    .equ    73H
+bit_2E.4    .equ    74H
+bit_2E.5    .equ    75H
+bit_2E.6    .equ    76H
+bit_2E.7    .equ    77H
+
+bit_2F.0    .equ    78H
+bit_2F.1    .equ    79H
+bit_2F.2    .equ    7AH
+bit_2F.3    .equ    7BH
+bit_2F.4    .equ    7CH
+bit_2F.5    .equ    7DH
+bit_2F.6    .equ    7EH
+bit_2F.7    .equ    7FH
+
+P0.0        .equ    80H
+P0.1        .equ    81H
+P0.2        .equ    82H
+P0.3        .equ    83H
+P0.4        .equ    84H
+P0.5        .equ    85H
+P0.6        .equ    86H
+P0.7        .equ    87H
+
+TCON.0      .equ    88H
+TCON.1      .equ    89H
+TCON.2      .equ    8AH
+TCON.3      .equ    8BH
+TCON.4      .equ    8CH
+TCON.5      .equ    8DH
+TCON.6      .equ    8EH
+TCON.7      .equ    8FH
+
+P1.0        .equ    90H
+P1.1        .equ    91H
+P1.2        .equ    92H
+P1.3        .equ    93H
+P1.4        .equ    94H
+P1.5        .equ    95H
+P1.6        .equ    96H
+P1.7        .equ    97H
+
+SCON.0      .equ    98H
+SCON.1      .equ    99H
+SCON.2      .equ    9AH
+SCON.3      .equ    9BH
+SCON.4      .equ    9CH
+SCON.5      .equ    9DH
+SCON.6      .equ    9EH
+SCON.7      .equ    9FH
+
+SCON0.0     .equ    98H
+SCON0.1     .equ    99H
+SCON0.2     .equ    9AH
+SCON0.3     .equ    9BH
+SCON0.4     .equ    9CH
+SCON0.5     .equ    9DH
+SCON0.6     .equ    9EH
+SCON0.7     .equ    9FH
+
+SCON1.0     .equ    0C0H
+SCON1.1     .equ    0C1H
+SCON1.2     .equ    0C2H
+SCON1.3     .equ    0C3H
+SCON1.4     .equ    0C4H
+SCON1.5     .equ    0C5H
+SCON1.6     .equ    0C6H
+SCON1.7     .equ    0C7H
+
+P2.0        .equ   0A0H
+P2.1        .equ   0A1H
+P2.2        .equ   0A2H
+P2.3        .equ   0A3H
+P2.4        .equ   0A4H
+P2.5        .equ   0A5H
+P2.6        .equ   0A6H
+P2.7        .equ   0A7H
+
+IE.0        .equ   0A8H
+IE.1        .equ   0A9H
+IE.2        .equ   0AAH
+IE.3        .equ   0ABH
+IE.4        .equ   0ACH
+IE.5        .equ   0ADH
+IE.6        .equ   0AEH
+IE.7        .equ   0AFH
+
+P3.0        .equ   0B0H
+P3.1        .equ   0B1H
+P3.2        .equ   0B2H
+P3.3        .equ   0B3H
+P3.4        .equ   0B4H
+P3.5        .equ   0B5H
+P3.6        .equ   0B6H
+P3.7        .equ   0B7H
+
+IP.0        .equ   0B8H
+IP.1        .equ   0B9H
+IP.2        .equ   0BAH
+IP.3        .equ   0BBH
+IP.4        .equ   0BCH
+IP.5        .equ   0BDH
+IP.6        .equ   0BEH
+IP.7        .equ   0BFH
+
+PSW.0       .equ   0D0H
+PSW.1       .equ   0D1H
+PSW.2       .equ   0D2H
+PSW.3       .equ   0D3H
+PSW.4       .equ   0D4H
+PSW.5       .equ   0D5H
+PSW.6       .equ   0D6H
+PSW.7       .equ   0D7H
+
+RWT         .equ    0D8H  ;WDCON.0
+EWT         .equ    0D9H  ;WDCON.1
+WTRF        .equ    0DAH  ;WDCON.2
+WDIF        .equ    0DBH  ;WDCON.3
+PFI         .equ    0DCH  ;WDCON.4
+EPFI        .equ    0DDH  ;WDCON.5
+POR         .equ    0DEH  ;WDCON.6
+SMOD        .equ    0DFH
+
+ACC.0       .equ   0E0H
+ACC.1       .equ   0E1H
+ACC.2       .equ   0E2H
+ACC.3       .equ   0E3H
+ACC.4       .equ   0E4H
+ACC.5       .equ   0E5H
+ACC.6       .equ   0E6H
+ACC.7       .equ   0E7H
+
+B.0         .equ   0F0H
+B.1         .equ   0F1H
+B.2         .equ   0F2H
+B.3         .equ   0F3H
+B.4         .equ   0F4H
+B.5         .equ   0F5H
+B.6         .equ   0F6H
+B.7         .equ   0F7H
+
+IT0         .equ    TCON.0
+IE0         .equ    TCON.1
+IT1         .equ    TCON.2
+IE1         .equ    TCON.3
+TR0         .equ    TCON.4
+TF0         .equ    TCON.5
+TR1         .equ    TCON.6
+TF1         .equ    TCON.7
+
+RI_0        .equ    SCON.0
+TI_0        .equ    SCON.1
+RI_1        .equ    SCON1.0
+TI_1        .equ    SCON1.1
+
+RI          .equ    SCON.0
+TI          .equ    SCON.1
+RB8         .equ    SCON.2
+TB8         .equ    SCON.3
+REN         .equ    SCON.4
+SM2         .equ    SCON.5
+SM1         .equ    SCON.6
+SM0         .equ    SCON.7
+
+EX0         .equ    IE.0
+ET0         .equ    IE.1
+EX1         .equ    IE.2
+ET1         .equ    IE.3
+ES          .equ    IE.4
+EA          .equ    IE.7
+
+RXD         .equ    P3.0
+TXD         .equ    P3.1
+INT0        .equ    P3.2
+INT1        .equ    P3.3
+T0          .equ    P3.4
+T1          .equ    P3.5
+WR          .equ    P3.6
+RD          .equ    P3.7
+
+PX0         .equ    IP.0
+PT0         .equ    IP.1
+PX1         .equ    IP.2
+PT1         .equ    IP.3
+PS          .equ    IP.4
+
+P           .equ    PSW.0
+OV          .equ    PSW.2
+RS0         .equ    PSW.3
+RS1         .equ    PSW.4
+F0          .equ    PSW.5
+AC          .equ    PSW.6
+CY          .equ    PSW.7
+
+P0          .equ    080H
+SP          .equ    081H
+DPL         .equ    082H
+DPH         .equ    083H
+DPL1        .equ    084H
+DPH1        .equ    085H
+DPS         .equ    086H
+PCON        .equ    087H
+TCON        .equ    088H
+TMOD        .equ    089H
+TL0         .equ    08AH
+TL1         .equ    08BH
+TH0         .equ    08CH
+TH1         .equ    08DH
+CKCON       .equ    08EH
+P1          .equ    090H
+EXIF        .equ    091H
+CKMOD       .equ    096H
+SCON        .equ    098H
+SCON0       .equ    098H
+SBUF        .equ    099H
+SBUF0       .equ    099H
+ACON        .equ    09DH
+P2          .equ    0A0H
+IE          .equ    0A8H
+SADDR0      .equ    0A9H
+SADDR1      .equ    0AAH
+P3          .equ    0B0H
+IP1         .equ    0B1H
+IP0         .equ    0B8H
+SADEN0      .equ    0B9H
+SADEN1      .equ    0BAH
+SCON1       .equ    0C0H
+SBUF1       .equ    0C1H
+ROMSIZE     .equ    0C2H
+PMR         .equ    0C4H
+STATUS      .equ    0C5H
+TA          .equ    0C7H
+T2CON       .equ    0C8H
+T2MOD       .equ    0C9H
+RCAP2L      .equ    0CAH
+RCAP2H      .equ    0CBH
+TL2         .equ    0CCH
+TH2         .equ    0CDH
+PSW         .equ    0D0H
+WDCON       .equ    0D8H
+ACC         .equ    0E0H
+EIE         .equ    0E8H
+B           .equ    0F0H
+EIP1        .equ    0F1H
+EIP0        .equ    0F8H
+.LIST

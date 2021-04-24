@@ -7,7 +7,7 @@ The Emulator's firmware also allows the user to display and modify the Dual Port
 The Emulator's [firmware](EPROM-Emulator.asm) is assembled using the [The Telemark Assembler](http://www.cpcalive.com/docs/TASMMAN.HTM) by Squak Valley Software.
 
 The EPROM Emulator was constructed on a Vector Prototyping board using wire-wrap techniques.
-<p align="center"><img src="/images/Emulator.jpg"/>
+<p align="center"><img src="/images/EPROM Emulator.JPEG"/>
 <p align="center">EPROM Emulator</p>
 <p align="center"><img src="/images/EPROM Emulator Schematic-1.png"/>
 <p align="center">EPROM Emulator Schematic</p>
